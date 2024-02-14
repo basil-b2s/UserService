@@ -8,37 +8,37 @@ namespace UserService
 {
     public class UserManagement
     {
-        private Dictionary<int, User> users = new Dictionary<int, User>();
+        private List<User> _users = new List<User>();
 
-        public event Action<string> UserAction;
+        public event Action<string, User> UserAction;
 
         public void AddUser(User user)
         {
-            users[user.Id] = user;
-            UserAction.Invoke($"user {user.Id} added");
+           _users.Add(user);
+            UserAction.Invoke("Added", user);
         }
 
-        public void RemoveUser(int id)
+       public void RemoveUser(int id)
         {
-            if (users.ContainsKey(id))
+            var user = _users.Find(u => u.Id == id);
+            if (user != null)
             {
-                var user = users[id];
-                users.Remove(id);
-                UserAction.Invoke($"User {user.Id} has been removed");
+                _users.Remove(user);
+                UserAction.Invoke("Removed", user);
             }
             else
             {
                 Console.WriteLine("No User Found");
             }
-
             
         }
 
         public void UpdateUser(int id, string key, string value)
         {
-            if (users.ContainsKey(id))
+            var user = _users.Find(u => u.Id == id);
+            if (user != null)
             {
-                var user = users[id];
+      
 
                 switch (key.ToLower())
                 {
@@ -55,7 +55,11 @@ namespace UserService
                         Console.WriteLine("No such key is present");
                         return;
                 }
-                UserAction.Invoke($"User {user.Id} data has been updated");
+                UserAction.Invoke("Updated", user);
+            }
+            else
+            {
+                Console.WriteLine("No User Found");
             }
         }
 
